@@ -44,6 +44,9 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   const completedPhases = queue.slice(0, queueIdx).reduce((acc, item) => acc + phasesForShloka(item.isNew).length, 0) + phaseIdx
   const progressPct = totalPhases > 0 ? (completedPhases / totalPhases) * 100 : 0
 
+  const scriptPreference = settings.scriptPreference || 'both'
+  const isRoman = scriptPreference === 'roman'
+
   const finishSession = useCallback(async () => {
     const todayStr = today()
     const session = {
@@ -146,7 +149,7 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   if (!currentItem) return null
 
   const { shloka } = currentItem
-  const lines = shloka.sanskrit.split('\n').filter(Boolean)
+  const lines = isRoman ? shloka.transliteration.split('\n').filter(Boolean) : shloka.sanskrit.split('\n').filter(Boolean)
 
   return (
     <div className="min-h-screen bg-base flex flex-col">
@@ -199,15 +202,15 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
         {currentPhase === 'listen' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <VerseDisplay shloka={shloka} />
-            <AudioPlayer src={shloka.audioPath} lines={lines} />
+            <AudioPlayer src={shloka.audioPath} lines={lines} isRoman={isRoman} />
           </div>
         )}
 
         {/* Repeat phase */}
         {currentPhase === 'repeat' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            <VerseDisplay shloka={shloka} showTransliteration />
-            <AudioPlayer src={shloka.audioPath} lines={lines} />
+            <VerseDisplay shloka={shloka} />
+            <AudioPlayer src={shloka.audioPath} lines={lines} isRoman={isRoman} />
             <p className="text-secondary text-sm text-center font-medium bg-surface p-4 rounded-2xl border border-border shadow-sm">
               Enable Line mode and repeat each line aloud during the pause
             </p>
@@ -233,6 +236,7 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
                     shloka={shloka}
                     allShlokas={shlokas}
                     onResult={correct => handleRecallResult(correct)}
+                    isRoman={isRoman}
                   />
                 )
               }
@@ -248,6 +252,7 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
                 <SelfRate
                   shloka={shloka}
                   onResult={rating => handleRecallResult(rating >= 3, rating)}
+                  isRoman={isRoman}
                 />
               )
             })()}

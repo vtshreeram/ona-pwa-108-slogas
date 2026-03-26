@@ -6,6 +6,7 @@ import { Eye, BrainCircuit } from 'lucide-react'
 interface SelfRateProps {
   shloka: Shloka
   onResult: (rating: number) => void
+  isRoman?: boolean
 }
 
 const RATINGS = [
@@ -16,10 +17,10 @@ const RATINGS = [
   { value: 5, label: 'Perfect', desc: 'Instant recall', color: 'bg-accent-green/10 border-accent-green/30 text-accent-green hover:bg-accent-green/20' },
 ]
 
-export default function SelfRate({ shloka, onResult }: SelfRateProps) {
+export default function SelfRate({ shloka, onResult, isRoman = false }: SelfRateProps) {
   const [revealed, setRevealed] = useState(false)
 
-  const lines = shloka.sanskrit.split('\n').filter(Boolean)
+  const lines = isRoman ? shloka.transliteration.split('\n').filter(Boolean) : shloka.sanskrit.split('\n').filter(Boolean)
 
   return (
     <div className="space-y-6">
@@ -34,7 +35,7 @@ export default function SelfRate({ shloka, onResult }: SelfRateProps) {
 
       {/* Audio cue — first line only hint */}
       <div className="bg-surface border border-border/60 shadow-sm rounded-3xl p-5 space-y-4">
-        <p className="font-devanagari text-2xl text-accent-purple text-center leading-loose">
+        <p className={`${isRoman ? 'font-serif text-xl italic' : 'font-devanagari text-2xl'} text-accent-purple text-center leading-loose`}>
           {lines[0]}
         </p>
         <AudioPlayer src={shloka.audioPath} compact />
@@ -53,7 +54,7 @@ export default function SelfRate({ shloka, onResult }: SelfRateProps) {
           <div className="bg-surface border border-border shadow-sm rounded-3xl p-6 text-center space-y-2 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-accent-gold" />
             {lines.map((line, i) => (
-              <p key={i} className={`font-devanagari text-xl leading-[1.8] ${i === 0 ? 'text-accent-purple font-medium' : 'text-primary'}`}>
+              <p key={i} className={`${isRoman ? 'font-serif text-lg italic' : 'font-devanagari text-xl'} leading-[1.8] ${i === 0 ? 'text-accent-purple font-medium' : 'text-primary'}`}>
                 {line}
               </p>
             ))}

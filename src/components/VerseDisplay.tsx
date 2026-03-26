@@ -6,17 +6,18 @@ interface VerseDisplayProps {
   shloka: Shloka
   showSynonyms?: boolean
   showTranslation?: boolean
-  showTransliteration?: boolean
 }
 
 export default function VerseDisplay({
   shloka,
   showSynonyms = false,
   showTranslation = false,
-  showTransliteration: showTransliterationProp,
 }: VerseDisplayProps) {
   const { settings } = useAppStore()
-  const showTranslit = showTransliterationProp ?? settings.showTransliteration
+  const scriptPreference = settings.scriptPreference || 'both'
+  const showDeva = scriptPreference === 'devanagari' || scriptPreference === 'both'
+  const showRoman = scriptPreference === 'roman' || scriptPreference === 'both'
+
   const [activeWord, setActiveWord] = useState<number | null>(null)
   const [selectedTranslator, setSelectedTranslator] = useState(settings.preferredTranslator)
 
@@ -36,28 +37,32 @@ export default function VerseDisplay({
         <span className="text-secondary text-xs font-medium">{shloka.thematicTag}</span>
       </div>
 
-      {/* Sanskrit text */}
-      <div className="text-center space-y-1">
-        {lines.map((line, i) => (
-          <p
-            key={i}
-            className="font-devanagari text-3xl leading-[1.8] text-primary"
-          >
-            {line}
-          </p>
-        ))}
-      </div>
+      <div className="text-center space-y-4">
+        {/* Sanskrit text */}
+        {showDeva && (
+          <div className="space-y-1">
+            {lines.map((line, i) => (
+              <p
+                key={`deva-${i}`}
+                className="font-devanagari text-3xl leading-[1.8] text-primary"
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        )}
 
-      {/* Transliteration */}
-      {showTranslit && (
-        <div className="text-center space-y-1 pt-2">
-          {translitLines.map((line, i) => (
-            <p key={i} className="text-secondary text-[15px] italic leading-relaxed">
-              {line}
-            </p>
-          ))}
-        </div>
-      )}
+        {/* Transliteration */}
+        {showRoman && (
+          <div className={`space-y-1 ${showDeva ? 'pt-2' : ''}`}>
+            {translitLines.map((line, i) => (
+              <p key={`roman-${i}`} className={`leading-relaxed ${showDeva ? 'text-secondary text-[15px] italic' : 'text-primary text-xl font-serif font-medium'}`}>
+                {line}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Synonyms */}
       {showSynonyms && shloka.wordMeanings.length > 0 && (

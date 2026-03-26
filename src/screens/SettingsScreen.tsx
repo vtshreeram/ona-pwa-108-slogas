@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { resetProgress } from '../lib/db'
-import { CheckCircle2, Moon, Sun, Monitor, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, Moon, Sun, Monitor, AlertTriangle, Type } from 'lucide-react'
 
 const TRANSLATORS = [
   { id: '16', name: 'Swami Prabhupada' },
@@ -77,6 +77,34 @@ export default function SettingsScreen() {
         </div>
       </div>
 
+      {/* Script Preference */}
+      <div className="card space-y-4">
+        <p className="section-label">Reading Script</p>
+        <div className="grid grid-cols-3 gap-2 p-1 bg-elevated rounded-2xl border border-border">
+          {[
+            { id: 'devanagari', label: 'Devanagari' },
+            { id: 'roman', label: 'English' },
+            { id: 'both', label: 'Both' }
+          ].map(t => {
+            const isActive = (settings.scriptPreference || 'both') === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => save({ scriptPreference: t.id as "devanagari" | "roman" | "both" })}
+                className={`flex flex-col items-center justify-center gap-1.5 py-3 rounded-xl transition-all duration-200 ${
+                  isActive 
+                    ? 'bg-surface shadow-sm text-primary font-medium' 
+                    : 'text-secondary hover:bg-surface/50'
+                }`}
+              >
+                <Type size={18} className={isActive ? 'text-accent-blue' : 'text-muted'} />
+                <span className="text-[11px] capitalize tracking-wide">{t.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Translator */}
       <div className="card space-y-3">
         <p className="section-label">Default Translator</p>
@@ -103,9 +131,9 @@ export default function SettingsScreen() {
         </div>
       </div>
 
-      {/* Audio & Display */}
+      {/* Audio preferences */}
       <div className="card space-y-5">
-        <p className="section-label">Preferences</p>
+        <p className="section-label">Audio Preferences</p>
         
         <div className="flex items-center justify-between">
           <span className="text-primary font-medium text-sm">Audio speed</span>
@@ -124,24 +152,6 @@ export default function SettingsScreen() {
               </button>
             ))}
           </div>
-        </div>
-        
-        <div className="h-px bg-border -mx-5" />
-
-        <div className="flex items-center justify-between">
-          <span className="text-primary font-medium text-sm">Show transliteration</span>
-          <button
-            onClick={() => save({ showTransliteration: !settings.showTransliteration })}
-            className={`w-12 h-6 rounded-full transition-colors duration-300 relative border ${
-              settings.showTransliteration 
-                ? 'bg-accent-green border-accent-green' 
-                : 'bg-elevated border-border'
-            }`}
-          >
-            <span className={`absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-full bg-white transition-transform duration-300 shadow-sm ${
-              settings.showTransliteration ? 'translate-x-[24px]' : 'translate-x-0'
-            }`} />
-          </button>
         </div>
       </div>
 

@@ -127,7 +127,7 @@ const SETTINGS_KEY = 'user'
 export const DEFAULT_SETTINGS: AppSettings = {
   preferredTranslator: '16', // Prabhupada author ID in gita/gita dataset
   defaultSpeed: 'normal',
-  showTransliteration: true,
+  scriptPreference: 'both',
   reminderEnabled: false,
   reminderTime: '07:00',
   currentDay: 1,

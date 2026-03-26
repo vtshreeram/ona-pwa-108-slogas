@@ -55,7 +55,7 @@ export interface Session {
 export interface AppSettings {
   preferredTranslator: string
   defaultSpeed: 'normal' | 'slow'
-  showTransliteration: boolean
+  scriptPreference: "devanagari" | "roman" | "both"
   reminderEnabled: boolean
   reminderTime: string | null  // "07:00"
   currentDay: number           // 1–53, or 55+ for maintenance

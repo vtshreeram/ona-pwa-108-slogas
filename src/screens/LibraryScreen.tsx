@@ -10,12 +10,14 @@ const CHAPTERS = ['All', ...Array.from({ length: 18 }, (_, i) => String(i + 1))]
 const MASTERY_FILTERS = ['All', 'New', 'Learning', 'Mastered']
 
 export default function LibraryScreen() {
-  const { shlokas, progress, updateProgress } = useAppStore()
+  const { shlokas, progress, updateProgress, settings } = useAppStore()
   const [selectedTag, setSelectedTag] = useState('All')
   const [selectedChapter, setSelectedChapter] = useState('All')
   const [selectedMastery, setSelectedMastery] = useState('All')
   const [search, setSearch] = useState('')
   const [detailShloka, setDetailShloka] = useState<Shloka | null>(null)
+
+  const isRoman = settings.scriptPreference === 'roman'
 
   const filtered = shlokas.filter(s => {
     if (selectedTag !== 'All' && s.thematicTag !== selectedTag) return false
@@ -42,8 +44,10 @@ export default function LibraryScreen() {
   if (detailShloka) {
     const p = progress[detailShloka.id]
     const isPinned = p?.pinned
+    const lines = isRoman ? detailShloka.transliteration.split('\n').filter(Boolean) : detailShloka.sanskrit.split('\n').filter(Boolean)
+
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-base flex flex-col">
         <div className="flex items-center gap-3 px-5 pt-safe pt-6 pb-4 bg-surface sticky top-0 z-20 border-b border-border shadow-sm">
           <button 
             onClick={() => setDetailShloka(null)} 
@@ -61,8 +65,8 @@ export default function LibraryScreen() {
           </button>
         </div>
         <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-6 pb-24 max-w-lg mx-auto w-full space-y-6">
-          <AudioPlayer src={detailShloka.audioPath} lines={detailShloka.sanskrit.split('\n').filter(Boolean)} />
-          <VerseDisplay shloka={detailShloka} showSynonyms showTranslation showTransliteration />
+          <AudioPlayer src={detailShloka.audioPath} lines={lines} isRoman={isRoman} />
+          <VerseDisplay shloka={detailShloka} showSynonyms showTranslation />
           {p && (
             <div className="card space-y-3">
               <p className="section-label mb-0">Progress Details</p>
@@ -96,7 +100,7 @@ export default function LibraryScreen() {
   return (
     <div className="flex flex-col pb-24 max-w-lg mx-auto">
       {/* Header */}
-      <div className="px-5 pt-8 pb-4 sticky top-0 bg-background z-10">
+      <div className="px-5 pt-8 pb-4 sticky top-0 bg-base z-10">
         <h1 className="text-primary font-serif font-semibold text-3xl mb-5">Library</h1>
         
         <div className="relative mb-5">
@@ -118,7 +122,7 @@ export default function LibraryScreen() {
               onClick={() => setSelectedMastery(f)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedMastery === f 
-                  ? 'bg-primary text-background shadow-sm' 
+                  ? 'bg-primary text-base shadow-sm' 
                   : 'bg-surface border border-border text-secondary hover:border-accent-purple/30'
               }`}
             >
@@ -132,7 +136,7 @@ export default function LibraryScreen() {
               onClick={() => setSelectedChapter(c)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedChapter === c 
-                  ? 'bg-primary text-background shadow-sm' 
+                  ? 'bg-primary text-base shadow-sm' 
                   : 'bg-surface border border-border text-secondary hover:border-accent-purple/30'
               }`}
             >
@@ -166,7 +170,7 @@ export default function LibraryScreen() {
         {filtered.map(shloka => {
           const p = progress[shloka.id]
           const mastery = p?.masteryLevel ?? 0
-          const firstLine = shloka.sanskrit.split('\n')[0]
+          const firstLine = isRoman ? shloka.transliteration.split('\n')[0] : shloka.sanskrit.split('\n')[0]
           
           return (
             <button
@@ -181,7 +185,7 @@ export default function LibraryScreen() {
                     <span className="w-1 h-1 rounded-full bg-border"></span>
                     <span className="text-secondary text-xs font-medium truncate">{shloka.thematicTag}</span>
                   </div>
-                  <p className="font-devanagari text-primary text-lg leading-snug truncate">
+                  <p className={`${isRoman ? 'font-serif italic' : 'font-devanagari'} text-primary text-lg leading-snug truncate`}>
                     {firstLine}
                   </p>
                 </div>

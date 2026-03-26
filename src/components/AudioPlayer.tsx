@@ -4,6 +4,7 @@ import { Play, Pause, RotateCcw, MonitorPlay, Waves } from 'lucide-react'
 interface AudioPlayerProps {
   src: string
   lines?: string[]          // for line-by-line repeat mode
+  isRoman?: boolean         // apply serif font instead of devanagari
   compact?: boolean
   youtubeUrl?: string
   onEnded?: () => void
@@ -11,7 +12,7 @@ interface AudioPlayerProps {
 
 const YT_PLAYLIST = 'https://www.youtube.com/watch?v=NcH9Iff4tYY&list=PLX0Ub3o9M5sIwlsm_qirzkwfDv2J7LHsV'
 
-export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, onEnded }: AudioPlayerProps) {
+export default function AudioPlayer({ src, lines, isRoman = false, compact = false, youtubeUrl, onEnded }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState<1 | 0.75>(1)
@@ -95,8 +96,8 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
         <button
           onClick={togglePlay}
           disabled={!loaded}
-          className="w-12 h-12 rounded-full bg-primary text-background flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shadow-md"
-          
+          className="w-12 h-12 rounded-full bg-primary text-base flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shadow-md"
+          style={{ color: 'var(--bg-base)' }}
           aria-label={playing ? 'Pause' : 'Play'}
         >
           {playing ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" className="ml-1" />}
@@ -159,7 +160,7 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
             return (
               <p
                 key={i}
-                className={`font-devanagari text-lg leading-relaxed transition-all cursor-pointer px-3 py-2 rounded-xl ${
+                className={`${isRoman ? 'font-serif' : 'font-devanagari'} text-lg leading-relaxed transition-all cursor-pointer px-3 py-2 rounded-xl ${
                   isActive 
                     ? 'text-accent-blue bg-surface shadow-sm font-medium' 
                     : 'text-secondary hover:text-primary hover:bg-surface/50'
