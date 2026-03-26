@@ -136,6 +136,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   lastSessionDate: null,
   pushSubscription: null,
   seeded: false,
+  theme: "system",
 }
 
 export async function getSettings(): Promise<AppSettings> {

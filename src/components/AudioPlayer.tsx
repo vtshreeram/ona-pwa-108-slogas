@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { Play, Pause, RotateCcw, MonitorPlay, Waves } from 'lucide-react'
 
 interface AudioPlayerProps {
   src: string
@@ -25,7 +26,6 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
   }, [speed])
 
   useEffect(() => {
-    // Reset when src changes
     setPlaying(false)
     setActiveLine(-1)
     setLoaded(false)
@@ -61,7 +61,6 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
     onEnded?.()
   }
 
-  // Line-by-line mode: simulate by splitting duration
   useEffect(() => {
     if (!lineMode || !lines?.length || !playing) return
     const audio = audioRef.current
@@ -79,7 +78,7 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
   }, [lineMode, lines, playing])
 
   return (
-    <div className={`flex flex-col gap-2 ${compact ? '' : 'bg-surface rounded-2xl p-4'}`}>
+    <div className={`flex flex-col gap-3 ${compact ? '' : 'bg-surface rounded-3xl p-5 shadow-sm border border-border/60'}`}>
       <audio
         ref={audioRef}
         src={src}
@@ -93,51 +92,47 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
         <button
           onClick={togglePlay}
           disabled={!loaded}
-          className="w-11 h-11 rounded-full bg-gold flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
+          className="w-12 h-12 rounded-full bg-primary text-background flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shadow-md"
+          
           aria-label={playing ? 'Pause' : 'Play'}
         >
-          {playing ? (
-            <svg className="w-5 h-5 text-base fill-current" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16" rx="1"/>
-              <rect x="14" y="4" width="4" height="16" rx="1"/>
-            </svg>
-          ) : (
-            <svg className="w-5 h-5 text-base fill-current ml-0.5" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          )}
+          {playing ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" className="ml-1" />}
         </button>
 
         {/* Replay */}
         <button
           onClick={replay}
-          className="w-9 h-9 rounded-full bg-elevated flex items-center justify-center active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full bg-elevated border border-border flex items-center justify-center active:scale-95 transition-all text-secondary hover:text-primary hover:border-border/80"
           aria-label="Replay"
         >
-          <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
+          <RotateCcw size={18} />
         </button>
+
+        <div className="h-6 w-px bg-border mx-1" />
 
         {/* Speed toggle */}
         <button
           onClick={toggleSpeed}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-            speed === 0.75 ? 'bg-gold text-base' : 'bg-elevated text-text-secondary'
+          className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+            speed === 0.75 
+              ? 'bg-accent-purple/10 text-accent-purple border-accent-purple/30' 
+              : 'bg-elevated text-secondary border-transparent hover:border-border/80'
           }`}
         >
           {speed === 1 ? '1×' : '¾×'}
         </button>
 
-        {/* Line mode toggle (only when lines provided) */}
+        {/* Line mode toggle */}
         {lines && lines.length > 1 && (
           <button
             onClick={() => setLineMode(m => !m)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-              lineMode ? 'bg-gold text-base' : 'bg-elevated text-text-secondary'
+            className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-semibold transition-all border ${
+              lineMode 
+                ? 'bg-accent-blue/10 text-accent-blue border-accent-blue/30' 
+                : 'bg-elevated text-secondary border-transparent hover:border-border/80'
             }`}
           >
-            Line
+            <Waves size={14} /> Line
           </button>
         )}
 
@@ -146,37 +141,40 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
           href={youtubeUrl || YT_PLAYLIST}
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto w-9 h-9 rounded-full bg-elevated flex items-center justify-center"
+          className="ml-auto w-10 h-10 rounded-full bg-elevated border border-border flex items-center justify-center text-accent-red hover:bg-accent-red/5 transition-colors"
           aria-label="Listen on YouTube"
         >
-          <svg className="w-4 h-4 text-[#FF0000]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
+          <MonitorPlay size={20} />
         </a>
       </div>
 
       {/* Line-by-line display */}
       {lineMode && lines && lines.length > 0 && (
-        <div className="mt-2 space-y-1">
-          {lines.map((line, i) => (
-            <p
-              key={i}
-              className={`font-devanagari text-base leading-relaxed transition-colors cursor-pointer px-2 py-1 rounded-lg ${
-                activeLine === i ? 'text-gold bg-elevated' : 'text-text-secondary'
-              }`}
-              onClick={() => {
-                const audio = audioRef.current
-                if (!audio || !audio.duration) return
-                const segDuration = audio.duration / lines.length
-                audio.currentTime = i * segDuration
-                audio.play().catch(() => {})
-                setPlaying(true)
-                setActiveLine(i)
-              }}
-            >
-              {line}
-            </p>
-          ))}
+        <div className="mt-3 space-y-1.5 bg-elevated p-3 rounded-2xl border border-border/50">
+          {lines.map((line, i) => {
+            const isActive = activeLine === i;
+            return (
+              <p
+                key={i}
+                className={`font-devanagari text-lg leading-relaxed transition-all cursor-pointer px-3 py-2 rounded-xl ${
+                  isActive 
+                    ? 'text-accent-blue bg-surface shadow-sm font-medium' 
+                    : 'text-secondary hover:text-primary hover:bg-surface/50'
+                }`}
+                onClick={() => {
+                  const audio = audioRef.current
+                  if (!audio || !audio.duration) return
+                  const segDuration = audio.duration / lines.length
+                  audio.currentTime = i * segDuration
+                  audio.play().catch(() => {})
+                  setPlaying(true)
+                  setActiveLine(i)
+                }}
+              >
+                {line}
+              </p>
+            )
+          })}
         </div>
       )}
     </div>

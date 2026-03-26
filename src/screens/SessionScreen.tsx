@@ -9,6 +9,7 @@ import MCQ from '../components/recall/MCQ'
 import FillBlank from '../components/recall/FillBlank'
 import SelfRate from '../components/recall/SelfRate'
 import { v4 as uuidv4 } from 'uuid'
+import { X, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 interface SessionScreenProps {
   duration: 15 | 30 | 60
@@ -43,16 +44,6 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   const completedPhases = queue.slice(0, queueIdx).reduce((acc, item) => acc + phasesForShloka(item.isNew).length, 0) + phaseIdx
   const progressPct = totalPhases > 0 ? (completedPhases / totalPhases) * 100 : 0
 
-  const advancePhase = useCallback(() => {
-    if (phaseIdx < phases.length - 1) {
-      setPhaseIdx(p => p + 1)
-    } else if (queueIdx < queue.length - 1) {
-      setQueueIdx(q => q + 1)
-      setPhaseIdx(0)
-    } else {
-      finishSession()
-    }
-  }, [phaseIdx, phases.length, queueIdx, queue.length])
 
   const handleRecallResult = useCallback(async (correct: boolean, selfRating?: number) => {
     if (!currentItem) return
@@ -84,7 +75,6 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
     }
     await addSession(session)
 
-    // Update streak
     const allSessions = [...sessions, session]
     const { current, longest } = computeStreak(allSessions)
     const newDay = settings.currentDay <= 54 ? settings.currentDay + 1 : settings.currentDay
@@ -100,11 +90,11 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
 
   if (queue.length === 0) {
     return (
-      <div className="min-h-screen bg-base flex flex-col items-center justify-center gap-6 px-6">
-        <div className="text-5xl">🙏</div>
-        <h2 className="text-text-primary font-bold text-xl text-center">Nothing due today</h2>
-        <p className="text-text-secondary text-center">All shlokas are up to date. Come back tomorrow!</p>
-        <button onClick={onExit} className="btn-primary">Back to Home</button>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
+        <div className="text-5xl text-accent-green mb-4"><CheckCircle2 size={64} strokeWidth={1.5} /></div>
+        <h2 className="text-primary font-serif font-medium text-3xl text-center">Nothing due today</h2>
+        <p className="text-secondary text-center text-sm max-w-[250px]">All shlokas are up to date. Come back tomorrow for your next practice!</p>
+        <button onClick={onExit} className="btn-primary mt-4 w-full max-w-[200px]">Back to Home</button>
       </div>
     )
   }
@@ -114,28 +104,30 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
       ? (results.reduce((a, b) => a + b.quality, 0) / results.length).toFixed(1)
       : '—'
     return (
-      <div className="min-h-screen bg-base flex flex-col items-center justify-center gap-6 px-6 max-w-lg mx-auto">
-        <div className="text-5xl">✨</div>
-        <h2 className="text-text-primary font-bold text-2xl text-center">Session Complete!</h2>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-8 px-6 max-w-lg mx-auto">
+        <div className="text-accent-purple bg-accent-purple/10 p-6 rounded-full">
+          <CheckCircle2 size={48} />
+        </div>
+        <h2 className="text-primary font-serif font-medium text-3xl text-center">Session Complete</h2>
         <div className="w-full card space-y-4">
-          <div className="flex justify-between">
-            <span className="text-text-secondary">Shlokas covered</span>
-            <span className="text-text-primary font-semibold">{queue.length}</span>
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-secondary font-medium">Shlokas covered</span>
+            <span className="text-primary font-serif font-medium text-xl">{queue.length}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-text-secondary">Recall score</span>
-            <span className="text-text-primary font-semibold">{avgQuality} / 5</span>
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-secondary font-medium">Recall score</span>
+            <span className="text-primary font-serif font-medium text-xl">{avgQuality} / 5</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-text-secondary">Streak</span>
-            <span className="text-gold font-bold">🔥 {settings.streakCount + 1} days</span>
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-secondary font-medium">Streak</span>
+            <span className="text-accent-gold font-serif font-medium text-xl">{settings.streakCount + 1} days</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-text-secondary">Duration</span>
-            <span className="text-text-primary font-semibold">{duration} min</span>
+          <div className="flex justify-between items-center py-2">
+            <span className="text-secondary font-medium">Duration</span>
+            <span className="text-primary font-serif font-medium text-xl">{duration} min</span>
           </div>
         </div>
-        <button onClick={onComplete} className="btn-primary w-full">Back to Home</button>
+        <button onClick={onComplete} className="btn-primary w-full mt-4">Return Home</button>
       </div>
     )
   }
@@ -146,55 +138,55 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   const lines = shloka.sanskrit.split('\n').filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-base flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
-      <div className="flex items-center gap-3 px-4 pt-safe pt-4 pb-3 border-b border-elevated">
-        <button onClick={onExit} className="text-text-muted p-1">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+      <div className="flex items-center gap-4 px-5 pt-safe pt-6 pb-4 bg-surface sticky top-0 z-20 border-b border-border shadow-sm">
+        <button onClick={onExit} className="text-secondary hover:text-primary transition-colors p-1 -ml-1">
+          <X size={24} />
         </button>
         <div className="flex-1">
-          <p className="text-text-muted text-xs">
-            BG {shloka.verseRange} · {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
-          </p>
-          <div className="mt-1.5 h-1.5 bg-elevated rounded-full overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-primary font-serif font-medium text-lg tracking-tight">
+              BG {shloka.verseRange}
+            </p>
+            <span className="text-muted text-xs font-semibold">{queueIdx + 1} / {queue.length}</span>
+          </div>
+          <div className="h-1.5 bg-elevated rounded-full overflow-hidden">
             <div
-              className="h-full bg-gold rounded-full transition-all duration-500"
+              className="h-full bg-accent-purple rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progressPct}%` }}
             />
           </div>
         </div>
-        <span className="text-text-muted text-xs">{queueIdx + 1}/{queue.length}</span>
       </div>
 
-      {/* Phase tabs */}
-      <div className="flex gap-1 px-4 py-2 border-b border-elevated">
-        {phases.map((ph, i) => (
-          <div
-            key={ph}
-            className={`flex-1 h-1 rounded-full transition-colors ${
-              i < phaseIdx ? 'bg-gold' : i === phaseIdx ? 'bg-gold/60' : 'bg-elevated'
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* Phase label */}
-      <div className="px-4 pt-4 pb-2">
-        <span className="section-label">
-          {currentPhase === 'listen' && 'Phase 1 — Listen'}
-          {currentPhase === 'repeat' && 'Phase 2 — Repeat'}
-          {currentPhase === 'understand' && 'Phase 3 — Understand'}
-          {currentPhase === 'recall' && 'Phase 4 — Recall'}
-        </span>
+      {/* Phase indicators */}
+      <div className="flex gap-1.5 px-5 py-3">
+        {phases.map((ph, i) => {
+          const isPast = i < phaseIdx
+          const isCurrent = i === phaseIdx
+          return (
+            <div
+              key={ph}
+              className={`flex-1 h-1.5 rounded-full transition-all duration-300 ${
+                isPast ? 'bg-accent-purple' : isCurrent ? 'bg-accent-purple/50' : 'bg-border'
+              }`}
+            />
+          )
+        })}
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-32">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-5 pb-32">
+        <div className="mb-6">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent-purple">
+            Step {phaseIdx + 1} • {currentPhase}
+          </span>
+        </div>
+
         {/* Listen phase */}
         {currentPhase === 'listen' && (
-          <div className="space-y-6 pt-2">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <VerseDisplay shloka={shloka} />
             <AudioPlayer src={shloka.audioPath} lines={lines} />
           </div>
@@ -202,10 +194,10 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
 
         {/* Repeat phase */}
         {currentPhase === 'repeat' && (
-          <div className="space-y-6 pt-2">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <VerseDisplay shloka={shloka} showTransliteration />
             <AudioPlayer src={shloka.audioPath} lines={lines} />
-            <p className="text-text-muted text-sm text-center">
+            <p className="text-secondary text-sm text-center font-medium bg-surface p-4 rounded-2xl border border-border shadow-sm">
               Enable Line mode and repeat each line aloud during the pause
             </p>
           </div>
@@ -213,54 +205,53 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
 
         {/* Understand phase */}
         {currentPhase === 'understand' && (
-          <div className="space-y-6 pt-2">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <VerseDisplay shloka={shloka} showSynonyms showTranslation />
             <AudioPlayer src={shloka.audioPath} compact />
           </div>
         )}
 
         {/* Recall phase */}
-        {currentPhase === 'recall' && (() => {
-          const mode = recallModeForMastery(currentItem.progress.masteryLevel)
-          if (mode === 'mcq') {
-            return (
-              <div className="pt-2">
-                <MCQ
+        {currentPhase === 'recall' && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+            {(() => {
+              const mode = recallModeForMastery(currentItem.progress.masteryLevel)
+              if (mode === 'mcq') {
+                return (
+                  <MCQ
+                    shloka={shloka}
+                    allShlokas={shlokas}
+                    onResult={correct => handleRecallResult(correct)}
+                  />
+                )
+              }
+              if (mode === 'fill') {
+                return (
+                  <FillBlank
+                    shloka={shloka}
+                    onResult={correct => handleRecallResult(correct)}
+                  />
+                )
+              }
+              return (
+                <SelfRate
                   shloka={shloka}
-                  allShlokas={shlokas}
-                  onResult={correct => handleRecallResult(correct)}
+                  onResult={rating => handleRecallResult(rating >= 3, rating)}
                 />
-              </div>
-            )
-          }
-          if (mode === 'fill') {
-            return (
-              <div className="pt-2">
-                <FillBlank
-                  shloka={shloka}
-                  onResult={correct => handleRecallResult(correct)}
-                />
-              </div>
-            )
-          }
-          return (
-            <div className="pt-2">
-              <SelfRate
-                shloka={shloka}
-                onResult={rating => handleRecallResult(rating >= 3, rating)}
-              />
-            </div>
-          )
-        })()}
+              )
+            })()}
+          </div>
+        )}
       </div>
 
       {/* Bottom action — shown for non-recall phases */}
       {currentPhase !== 'recall' && (
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-safe pb-6 pt-4 bg-gradient-to-t from-base via-base/95 to-transparent">
-          <button onClick={advancePhase} className="btn-primary w-full max-w-lg mx-auto block">
-            {currentPhase === 'listen' && 'Next →'}
-            {currentPhase === 'repeat' && 'Done Repeating →'}
-            {currentPhase === 'understand' && 'I Understand →'}
+        <div className="fixed bottom-0 left-0 right-0 px-5 pb-safe pb-6 pt-6 bg-gradient-to-t from-base via-base to-transparent z-10">
+          <button onClick={advancePhase} className="btn-primary w-full max-w-lg mx-auto">
+            {currentPhase === 'listen' && 'Next step'}
+            {currentPhase === 'repeat' && 'Done repeating'}
+            {currentPhase === 'understand' && 'I understand'}
+            <ArrowRight size={18} />
           </button>
         </div>
       )}

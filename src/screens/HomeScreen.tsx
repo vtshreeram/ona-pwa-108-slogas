@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { today } from '../lib/srs'
+import { Play, CheckCircle2, Flame, BookOpen, ArrowRight, PlayCircle, TrendingUp, Award } from 'lucide-react'
 
 const YT_PLAYLIST = 'https://www.youtube.com/watch?v=NcH9Iff4tYY&list=PLX0Ub3o9M5sIwlsm_qirzkwfDv2J7LHsV'
 const CHAPTERS = Array.from({ length: 18 }, (_, i) => i + 1)
@@ -21,147 +22,160 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const dueCount = Object.values(progress).filter(p => p.nextReviewDate <= todayStr && p.masteryLevel > 0).length
   const todayDone = sessions.some(s => s.date === todayStr && s.completed)
 
-  // Chapter completion
   const chapterProgress = CHAPTERS.map(ch => {
     const chShlokas = shlokas.filter(s => s.chapter === ch)
     const learned = chShlokas.filter(s => (progress[s.id]?.masteryLevel ?? 0) > 0).length
     return { ch, total: chShlokas.length, learned }
   })
 
-  const progressPct = shlokas.length > 0 ? (learnedCount / shlokas.length) * 100 : 0
-  const circumference = 2 * Math.PI * 44 // r=44
+  const progressPct = shlokas.length > 0 ? Math.round((learnedCount / shlokas.length) * 100) : 0
 
   return (
-    <div className="flex flex-col gap-6 pb-24 px-4 pt-6 max-w-lg mx-auto">
+    <div className="flex flex-col gap-6 px-5 pt-8 max-w-lg mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-text-primary font-bold text-xl">Gita Sadhana</h1>
-          <p className="text-text-muted text-sm">{new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+          <p className="text-secondary font-medium mb-1">
+            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+          <h1 className="text-primary font-serif font-semibold text-4xl tracking-tight">Today's vibe</h1>
         </div>
         <a
           href={YT_PLAYLIST}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-elevated px-3 py-2 rounded-xl text-xs text-text-secondary"
+          className="flex items-center gap-1.5 bg-surface shadow-soft border border-border px-3 py-2 rounded-2xl text-xs font-medium text-secondary hover:text-accent-red transition-colors"
         >
-          <svg className="w-3.5 h-3.5 text-[#FF0000]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-          </svg>
-          YouTube
+          <PlayCircle size={16} className="text-accent-red" />
+          Listen
         </a>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3">
-        {/* Progress ring */}
-        <div className="card flex flex-col items-center gap-2 col-span-1">
-          <svg width="100" height="100" className="-rotate-90">
-            <circle cx="50" cy="50" r="44" fill="none" stroke="#2C2C2E" strokeWidth="8"/>
-            <circle
-              cx="50" cy="50" r="44" fill="none"
-              stroke="#C8922A" strokeWidth="8"
-              strokeDasharray={circumference}
-              strokeDashoffset={circumference * (1 - progressPct / 100)}
-              strokeLinecap="round"
-              className="transition-all duration-700"
-            />
-          </svg>
-          <div className="text-center -mt-14">
-            <p className="text-text-primary font-bold text-lg">{learnedCount}</p>
-            <p className="text-text-muted text-xs">of 108</p>
+      {/* Simplified & Compact Stats Bar */}
+      <div className="bg-surface border border-border rounded-3xl p-2 flex items-center justify-around shadow-sm shadow-black/5">
+        <div className="flex flex-col items-center flex-1 py-1 border-r border-border/50 last:border-0">
+          <span className="text-[10px] font-bold text-muted uppercase tracking-tighter mb-0.5">Progress</span>
+          <div className="flex items-center gap-1">
+            <TrendingUp size={12} className="text-accent-blue" />
+            <span className="text-primary font-serif font-bold text-lg leading-none">{progressPct}%</span>
           </div>
-          <p className="text-text-secondary text-xs mt-8">Learned</p>
         </div>
-
-        <div className="col-span-2 flex flex-col gap-3">
-          {/* Streak */}
-          <div className="card flex items-center gap-3">
-            <span className="text-2xl">🔥</span>
-            <div>
-              <p className="text-text-primary font-bold text-xl">{settings.streakCount}</p>
-              <p className="text-text-muted text-xs">day streak</p>
-            </div>
+        <div className="flex flex-col items-center flex-1 py-1 border-r border-border/50 last:border-0">
+          <span className="text-[10px] font-bold text-muted uppercase tracking-tighter mb-0.5">Streak</span>
+          <div className="flex items-center gap-1">
+            <Flame size={12} className="text-accent-gold" />
+            <span className="text-primary font-serif font-bold text-lg leading-none">{settings.streakCount}</span>
           </div>
-          {/* Due today */}
-          <div className="card flex items-center gap-3">
-            <span className="text-2xl">📖</span>
-            <div>
-              <p className="text-text-primary font-bold text-xl">{dueCount}</p>
-              <p className="text-text-muted text-xs">due for review</p>
-            </div>
+        </div>
+        <div className="flex flex-col items-center flex-1 py-1 border-r border-border/50 last:border-0">
+          <span className="text-[10px] font-bold text-muted uppercase tracking-tighter mb-0.5">Learned</span>
+          <div className="flex items-center gap-1">
+            <Award size={12} className="text-accent-purple" />
+            <span className="text-primary font-serif font-bold text-lg leading-none">{learnedCount}</span>
+          </div>
+        </div>
+        <div className="flex flex-col items-center flex-1 py-1 last:border-0">
+          <span className="text-[10px] font-bold text-muted uppercase tracking-tighter mb-0.5">Due</span>
+          <div className="flex items-center gap-1">
+            <BookOpen size={12} className="text-accent-purple" />
+            <span className="text-primary font-serif font-bold text-lg leading-none">{dueCount}</span>
           </div>
         </div>
       </div>
 
-      {/* Today's session card */}
-      <div className="card border border-elevated">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="section-label">{dayLabel}</p>
-            <p className="text-text-primary font-semibold text-lg mt-1">
-              {isMaintenance ? 'Maintenance Mode' : "Today's Practice"}
-            </p>
-            <p className="text-text-secondary text-sm mt-0.5">
-              {isMaintenance
-                ? 'Keep the flame alive with SRS reviews'
-                : `${dueCount} reviews · ${settings.currentDay <= 54 ? '2 new shlokas' : ''}`}
-            </p>
-          </div>
+      {/* Main Action Section */}
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h2 className="font-serif text-2xl text-primary font-medium">Practice</h2>
+          <span className="text-xs font-medium text-muted uppercase tracking-widest">{dayLabel}</span>
+        </div>
+
+        <div className="card relative overflow-hidden group">
           {todayDone && (
-            <div className="w-10 h-10 rounded-full bg-green-900/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/>
-              </svg>
+            <div className="absolute top-4 right-4 text-accent-green bg-accent-green/10 p-2 rounded-full">
+              <CheckCircle2 size={24} />
             </div>
           )}
-        </div>
+          
+          <div className="mb-6">
+            <h3 className="font-serif text-xl font-medium text-primary mb-1">
+              {isMaintenance ? 'Maintenance Mode' : "Daily Sadhana"}
+            </h3>
+            <p className="text-secondary text-sm leading-relaxed">
+              {isMaintenance
+                ? 'Keep the flame alive with spaced repetition reviews.'
+                : `Focusing on ${dueCount} reviews today. Consistency brings clarity.`}
+            </p>
+          </div>
 
-        {!todayDone ? (
-          !showDurationPicker ? (
-            <button
-              onClick={() => setShowDurationPicker(true)}
-              className="btn-primary w-full"
-            >
-              Start Practice
-            </button>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-text-muted text-xs text-center mb-3">How much time do you have?</p>
-              {([15, 30, 60] as const).map(d => (
-                <button
-                  key={d}
-                  onClick={() => onStartSession(d)}
-                  className="w-full bg-elevated hover:bg-gold/10 border border-elevated hover:border-gold/40 rounded-xl px-4 py-3 text-left transition-colors"
-                >
-                  <span className="text-text-primary font-semibold">{d} min</span>
-                  <span className="text-text-muted text-sm ml-2">
-                    {d === 15 ? '— Reviews only' : d === 30 ? '— 1 new shloka + reviews' : '— 2 new shlokas + reviews'}
-                  </span>
-                </button>
-              ))}
-              <button onClick={() => setShowDurationPicker(false)} className="w-full text-text-muted text-sm py-2">
-                Cancel
+          {!todayDone ? (
+            !showDurationPicker ? (
+              <button
+                onClick={() => setShowDurationPicker(true)}
+                className="btn-primary w-full"
+              >
+                Begin Session <ArrowRight size={18} />
               </button>
-            </div>
-          )
-        ) : (
-          <p className="text-green-400 text-sm text-center font-medium">✓ Practice complete for today</p>
-        )}
+            ) : (
+              <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <p className="text-xs font-medium text-muted uppercase tracking-widest text-center mb-1">Select Duration</p>
+                {([15, 30, 60] as const).map(d => (
+                  <button
+                    key={d}
+                    onClick={() => onStartSession(d)}
+                    className="flex items-center justify-between w-full bg-surface border border-border hover:border-accent-purple rounded-2xl px-5 py-4 transition-all duration-200"
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-primary font-serif font-medium text-lg">{d} minutes</span>
+                      <span className="text-secondary text-xs mt-0.5">
+                        {d === 15 ? 'Reviews only' : d === 30 ? '1 new + reviews' : '2 new + reviews'}
+                      </span>
+                    </div>
+                    <Play size={18} className="text-accent-purple" />
+                  </button>
+                ))}
+                <button 
+                  onClick={() => setShowDurationPicker(false)} 
+                  className="w-full text-secondary text-sm font-medium py-3 mt-1 hover:text-primary transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )
+          ) : (
+             <div className="bg-accent-green/10 text-accent-green rounded-2xl p-4 flex items-center justify-center gap-2 font-medium">
+               <CheckCircle2 size={20} />
+               Practice complete for today
+             </div>
+          )}
+        </div>
       </div>
 
-      {/* Chapter progress grid */}
-      <div>
-        <p className="section-label mb-3">Chapters</p>
-        <div className="grid grid-cols-6 gap-2">
+      {/* Chapters Grid */}
+      <div className="mt-2 mb-8">
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">Chapters</h2>
+        <div className="grid grid-cols-6 gap-2 sm:gap-3">
           {chapterProgress.map(({ ch, total, learned }) => {
             const pct = total > 0 ? learned / total : 0
-            const bg = pct === 0 ? 'bg-elevated' : pct === 1 ? 'bg-green-800' : 'bg-gold/30'
-            const text = pct === 0 ? 'text-text-muted' : pct === 1 ? 'text-green-300' : 'text-gold'
+            const isComplete = pct === 1
+            const inProgress = pct > 0 && pct < 1
+            
             return (
-              <div key={ch} className={`${bg} rounded-xl p-2 text-center`}>
-                <p className={`font-bold text-sm ${text}`}>{ch}</p>
-                <p className="text-text-muted text-xs">{learned}/{total}</p>
+              <div 
+                key={ch} 
+                className={`
+                  rounded-2xl p-2.5 flex flex-col items-center justify-center aspect-square border transition-colors
+                  ${isComplete ? 'bg-accent-green/10 border-accent-green/20' : 
+                    inProgress ? 'bg-accent-gold/10 border-accent-gold/20' : 
+                    'bg-surface border-border'}
+                `}
+              >
+                <span className={`font-serif text-lg leading-none mb-1 ${isComplete ? 'text-accent-green' : inProgress ? 'text-accent-gold' : 'text-primary'}`}>
+                  {ch}
+                </span>
+                <span className={`text-[10px] font-medium ${isComplete ? 'text-accent-green' : inProgress ? 'text-accent-gold' : 'text-muted'}`}>
+                  {learned}/{total}
+                </span>
               </div>
             )
           })}

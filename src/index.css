@@ -1,17 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-base: 249 246 240;
+    --bg-surface: 255 255 255;
+    --bg-elevated: 255 255 255;
+    --text-primary: 28 28 30;
+    --text-secondary: 92 92 94;
+    --text-muted: 153 153 153;
+    --border-subtle: 230 226 214;
+    
+    --accent-purple: 138 79 255;
+    --accent-gold: 244 185 66;
+    --accent-blue: 164 216 240;
+    --accent-green: 10 80 40;
+    --accent-red: 255 59 48;
+  }
+
+  .dark {
+    --bg-base: 18 18 18;
+    --bg-surface: 30 30 30;
+    --bg-elevated: 44 44 46;
+    --text-primary: 249 246 240;
+    --text-secondary: 168 162 158;
+    --text-muted: 107 114 128;
+    --border-subtle: 51 51 51;
+    
+    --accent-purple: 157 107 255;
+    --accent-gold: 221 163 49;
+    --accent-blue: 131 187 213;
+    --accent-green: 76 175 80;
+    --accent-red: 255 69 58;
+  }
+
   html, body, #root {
-    @apply bg-base text-text-primary min-h-screen;
+    @apply bg-background text-primary min-h-screen transition-colors duration-300;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   * {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Newsreader', serif;
   }
 }
 
@@ -21,19 +57,27 @@
   }
 
   .section-label {
-    @apply text-gold text-xs font-semibold uppercase tracking-widest;
+    @apply text-muted text-xs font-semibold uppercase tracking-wider mb-2 block;
   }
 
   .card {
-    @apply bg-surface rounded-2xl p-4;
+    @apply bg-surface rounded-3xl p-5 shadow-card border border-border/50 transition-all duration-300;
+  }
+  
+  .dark .card {
+    @apply shadow-none border-border;
   }
 
   .btn-primary {
-    @apply bg-gold text-base font-semibold px-6 py-3 rounded-xl active:opacity-80 transition-opacity;
+    @apply bg-accent-purple text-white text-base font-semibold px-6 py-4 rounded-2xl active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-accent-purple/20;
+  }
+
+  .dark .btn-primary {
+    @apply shadow-none;
   }
 
   .btn-ghost {
-    @apply text-text-secondary border border-elevated px-4 py-2 rounded-xl active:opacity-70 transition-opacity;
+    @apply text-secondary bg-transparent hover:bg-border/30 px-4 py-2.5 rounded-2xl active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2;
   }
 
   /* Hide scrollbar but keep scroll */

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { today } from '../lib/srs'
 import { exportData, importData } from '../lib/db'
+import { Download, Upload, TrendingUp, Award, Flame } from 'lucide-react'
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr)
@@ -66,72 +67,77 @@ export default function ProgressScreen() {
   const masteredCount = Object.values(progress).filter(p => p.masteryLevel >= 4).length
 
   return (
-    <div className="flex flex-col pb-24 px-4 pt-6 max-w-lg mx-auto space-y-6">
-      <h2 className="text-text-primary font-bold text-xl">Progress</h2>
+    <div className="flex flex-col pb-24 px-5 pt-8 max-w-lg mx-auto space-y-8">
+      <h1 className="text-primary font-serif font-semibold text-3xl">Insights</h1>
 
       {/* Summary stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="card text-center">
-          <p className="text-gold font-bold text-2xl">{settings.streakCount}</p>
-          <p className="text-text-muted text-xs mt-1">Current streak</p>
+        <div className="bg-surface rounded-3xl p-4 flex flex-col items-center justify-center text-center shadow-sm border border-border">
+          <Flame size={20} className="text-accent-gold mb-1.5" />
+          <p className="text-primary font-serif font-bold text-2xl leading-none">{settings.streakCount}</p>
+          <p className="text-muted text-[10px] uppercase tracking-wider font-semibold mt-1">Streak</p>
         </div>
-        <div className="card text-center">
-          <p className="text-text-primary font-bold text-2xl">{learnedCount}</p>
-          <p className="text-text-muted text-xs mt-1">Learned</p>
+        <div className="bg-surface rounded-3xl p-4 flex flex-col items-center justify-center text-center shadow-sm border border-border">
+          <TrendingUp size={20} className="text-accent-blue mb-1.5" />
+          <p className="text-primary font-serif font-bold text-2xl leading-none">{learnedCount}</p>
+          <p className="text-muted text-[10px] uppercase tracking-wider font-semibold mt-1">Learned</p>
         </div>
-        <div className="card text-center">
-          <p className="text-text-primary font-bold text-2xl">{masteredCount}</p>
-          <p className="text-text-muted text-xs mt-1">Mastered</p>
+        <div className="bg-surface rounded-3xl p-4 flex flex-col items-center justify-center text-center shadow-sm border border-border">
+          <Award size={20} className="text-accent-purple mb-1.5" />
+          <p className="text-primary font-serif font-bold text-2xl leading-none">{masteredCount}</p>
+          <p className="text-muted text-[10px] uppercase tracking-wider font-semibold mt-1">Mastered</p>
         </div>
       </div>
 
       {/* 54-day heatmap */}
       <div>
-        <p className="section-label mb-3">54-Day Journey</p>
-        <div className="grid grid-cols-9 gap-1.5">
-          {calendarDays.map(({ dayNum, done, isFuture, isToday }) => (
-            <div
-              key={dayNum}
-              title={`Day ${dayNum}`}
-              className={`aspect-square rounded-lg flex items-center justify-center text-xs font-medium transition-colors ${
-                isFuture
-                  ? 'bg-elevated text-text-muted'
-                  : done
-                  ? 'bg-green-700 text-green-100'
-                  : isToday
-                  ? 'bg-gold/30 text-gold border border-gold/50'
-                  : 'bg-red-900/40 text-red-400'
-              }`}
-            >
-              {dayNum}
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-4 mt-3 text-xs text-text-muted">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-700 inline-block"/>Done</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-900/40 inline-block"/>Missed</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-elevated inline-block"/>Upcoming</span>
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">54-Day Journey</h2>
+        <div className="card">
+          <div className="grid grid-cols-9 gap-1.5 sm:gap-2">
+            {calendarDays.map(({ dayNum, done, isFuture, isToday }) => (
+              <div
+                key={dayNum}
+                title={`Day ${dayNum}`}
+                className={`aspect-square rounded-xl flex items-center justify-center text-xs font-semibold transition-all ${
+                  isFuture
+                    ? 'bg-elevated/50 text-muted border border-transparent'
+                    : done
+                    ? 'bg-accent-green/20 text-accent-green border border-accent-green/30'
+                    : isToday
+                    ? 'bg-accent-gold/20 text-accent-gold border border-accent-gold shadow-[0_0_10px_rgba(244,185,66,0.3)]'
+                    : 'bg-accent-red/10 text-accent-red border border-transparent'
+                }`}
+              >
+                {dayNum}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center gap-5 mt-5 text-xs text-secondary font-medium">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-accent-green/40 border border-accent-green/50"/>Done</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-accent-red/30 border border-accent-red/20"/>Missed</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-elevated border border-border"/>Future</span>
+          </div>
         </div>
       </div>
 
       {/* Mastery distribution */}
       <div>
-        <p className="section-label mb-3">Mastery Distribution</p>
-        <div className="space-y-2">
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">Mastery Distribution</h2>
+        <div className="card space-y-3.5">
           {masteryDist.map(({ level, count }) => {
             const pct = shlokas.length > 0 ? (count / shlokas.length) * 100 : 0
             const labels = ['New', 'Introduced', 'Familiar', 'Learning', 'Proficient', 'Mastered']
-            const colors = ['bg-elevated', 'bg-red-800', 'bg-orange-800', 'bg-yellow-800', 'bg-green-800', 'bg-emerald-700']
+            const colors = ['bg-border', 'bg-accent-red', 'bg-accent-gold', 'bg-[#D4A373]', 'bg-accent-blue', 'bg-accent-green']
             return (
               <div key={level} className="flex items-center gap-3">
-                <span className="text-text-muted text-xs w-20 shrink-0">{labels[level]}</span>
+                <span className="text-secondary text-xs font-medium w-20 shrink-0">{labels[level]}</span>
                 <div className="flex-1 h-2 bg-elevated rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${colors[level]}`}
+                    className={`h-full rounded-full transition-all duration-1000 ease-out ${colors[level]}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-text-secondary text-xs w-6 text-right">{count}</span>
+                <span className="text-primary font-semibold text-xs w-8 text-right">{count}</span>
               </div>
             )
           })}
@@ -140,22 +146,22 @@ export default function ProgressScreen() {
 
       {/* Chapter breakdown */}
       <div>
-        <p className="section-label mb-3">By Chapter</p>
-        <div className="space-y-2">
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">By Chapter</h2>
+        <div className="card space-y-3.5">
           {Array.from({ length: 18 }, (_, i) => i + 1).map(ch => {
             const chShlokas = shlokas.filter(s => s.chapter === ch)
             const learned = chShlokas.filter(s => (progress[s.id]?.masteryLevel ?? 0) > 0).length
             const pct = chShlokas.length > 0 ? (learned / chShlokas.length) * 100 : 0
             return (
               <div key={ch} className="flex items-center gap-3">
-                <span className="text-text-muted text-xs w-14 shrink-0">Ch. {ch}</span>
+                <span className="text-secondary text-xs font-medium w-14 shrink-0">Ch. {ch}</span>
                 <div className="flex-1 h-2 bg-elevated rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gold rounded-full transition-all duration-700"
+                    className="h-full bg-accent-purple rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-text-secondary text-xs w-10 text-right">{learned}/{chShlokas.length}</span>
+                <span className="text-primary font-semibold text-xs w-10 text-right">{learned}/{chShlokas.length}</span>
               </div>
             )
           })}
@@ -163,20 +169,24 @@ export default function ProgressScreen() {
       </div>
 
       {/* Export / Import */}
-      <div className="card space-y-3">
-        <p className="section-label">Data</p>
-        <button onClick={handleExport} className="w-full bg-elevated text-text-primary rounded-xl px-4 py-3 text-sm font-medium text-left flex items-center gap-3">
-          <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          Export backup (JSON)
-        </button>
-        <button onClick={handleImport} className="w-full bg-elevated text-text-primary rounded-xl px-4 py-3 text-sm font-medium text-left flex items-center gap-3">
-          <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/>
-          </svg>
-          Import backup (JSON)
-        </button>
+      <div className="pt-4">
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">Data</h2>
+        <div className="card space-y-2 flex flex-col">
+          <button 
+            onClick={handleExport} 
+            className="w-full bg-elevated hover:bg-border/30 text-primary rounded-2xl px-5 py-3.5 text-sm font-medium text-left flex items-center gap-3 transition-colors border border-border/50"
+          >
+            <Download size={18} className="text-accent-purple" />
+            Export backup (JSON)
+          </button>
+          <button 
+            onClick={handleImport} 
+            className="w-full bg-elevated hover:bg-border/30 text-primary rounded-2xl px-5 py-3.5 text-sm font-medium text-left flex items-center gap-3 transition-colors border border-border/50"
+          >
+            <Upload size={18} className="text-accent-purple" />
+            Import backup (JSON)
+          </button>
+        </div>
       </div>
     </div>
   )

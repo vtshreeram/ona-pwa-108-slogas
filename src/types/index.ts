@@ -64,6 +64,7 @@ export interface AppSettings {
   lastSessionDate: string | null
   pushSubscription: string | null
   seeded: boolean
+  theme: "system" | "light" | "dark"
 }
 
 export type SessionPhase = 'listen' | 'repeat' | 'understand' | 'recall'

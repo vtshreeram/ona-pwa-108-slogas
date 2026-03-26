@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { Shloka } from '../../types'
+import { CheckCircle2, XCircle } from 'lucide-react'
 
 interface MCQProps {
   shloka: Shloka
@@ -14,7 +15,6 @@ export default function MCQ({ shloka, allShlokas, onResult }: MCQProps) {
   const questionLine = lines[0]
   const correctAnswer = lines.slice(1).join('\n') || lines[0]
 
-  // Build 3 wrong options from other shlokas
   const options = useMemo(() => {
     const others = allShlokas
       .filter(s => s.id !== shloka.id)
@@ -33,33 +33,51 @@ export default function MCQ({ shloka, allShlokas, onResult }: MCQProps) {
   const handleSelect = (idx: number) => {
     if (selected !== null) return
     setSelected(idx)
-    setTimeout(() => onResult(options[idx].correct), 1000)
+    setTimeout(() => onResult(options[idx].correct), 1200)
   }
 
   return (
-    <div className="space-y-5">
-      <div>
-        <p className="section-label mb-3">Complete the verse</p>
-        <p className="font-devanagari text-xl text-text-primary leading-loose text-center bg-elevated rounded-xl p-4">
-          {questionLine}
-        </p>
-        <p className="text-text-muted text-xs text-center mt-1">Select the correct continuation</p>
+    <div className="space-y-6">
+      <div className="text-center">
+        <p className="text-secondary text-sm font-medium mb-4">Select the correct continuation</p>
+        <div className="bg-surface shadow-sm border border-border/60 rounded-3xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-accent-purple" />
+          <p className="font-devanagari text-2xl text-primary leading-loose">
+            {questionLine}
+          </p>
+        </div>
       </div>
 
       <div className="space-y-3">
         {options.map((opt, i) => {
-          let cls = 'bg-elevated border border-elevated text-text-secondary'
-          if (selected !== null) {
-            if (opt.correct) cls = 'bg-green-900/40 border border-green-500 text-green-300'
-            else if (selected === i) cls = 'bg-red-900/40 border border-red-500 text-red-300'
+          const isSelected = selected === i
+          const isCorrect = opt.correct
+          const showResult = selected !== null
+          
+          let cls = 'bg-surface border-border text-secondary hover:border-accent-purple/40 hover:shadow-sm'
+          let Icon = null
+          
+          if (showResult) {
+            if (isCorrect) {
+              cls = 'bg-accent-green/10 border-accent-green/40 text-accent-green shadow-sm'
+              Icon = CheckCircle2
+            } else if (isSelected) {
+              cls = 'bg-accent-red/10 border-accent-red/40 text-accent-red'
+              Icon = XCircle
+            } else {
+              cls = 'bg-surface border-border text-muted opacity-50'
+            }
           }
+          
           return (
             <button
               key={i}
               onClick={() => handleSelect(i)}
-              className={`w-full text-left rounded-xl p-4 font-devanagari text-base leading-relaxed transition-colors ${cls}`}
+              disabled={showResult}
+              className={`w-full text-left rounded-2xl p-5 font-devanagari text-lg leading-relaxed transition-all duration-300 border flex items-start gap-3 ${cls}`}
             >
-              {opt.text}
+              <div className="flex-1 mt-1">{opt.text}</div>
+              {Icon && <Icon size={20} className="shrink-0 mt-1.5" />}
             </button>
           )
         })}

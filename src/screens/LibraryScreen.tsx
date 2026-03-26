@@ -3,6 +3,7 @@ import { useAppStore } from '../store/useAppStore'
 import type { Shloka } from '../types'
 import VerseDisplay from '../components/VerseDisplay'
 import AudioPlayer from '../components/AudioPlayer'
+import { Search, ChevronLeft, Bookmark, Star } from 'lucide-react'
 
 const TAGS = ['All', 'Dharma & Duty', 'Atman & Immortality', 'Karma Yoga', 'Jnana Yoga', 'Dhyana Yoga', 'Bhakti Yoga', 'Vibhuti', 'Kshetra & Kshetrajna', 'Gunas', 'Purushottama', 'Daivi Svabhava', 'Moksha']
 const CHAPTERS = ['All', ...Array.from({ length: 18 }, (_, i) => String(i + 1))]
@@ -40,42 +41,50 @@ export default function LibraryScreen() {
 
   if (detailShloka) {
     const p = progress[detailShloka.id]
+    const isPinned = p?.pinned
     return (
-      <div className="min-h-screen bg-base flex flex-col">
-        <div className="flex items-center gap-3 px-4 pt-safe pt-4 pb-3 border-b border-elevated">
-          <button onClick={() => setDetailShloka(null)} className="text-text-muted p-1">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
-            </svg>
+      <div className="min-h-screen bg-background flex flex-col">
+        <div className="flex items-center gap-3 px-5 pt-safe pt-6 pb-4 bg-surface sticky top-0 z-20 border-b border-border shadow-sm">
+          <button 
+            onClick={() => setDetailShloka(null)} 
+            className="text-secondary hover:text-primary transition-colors p-1 -ml-1"
+          >
+            <ChevronLeft size={24} />
           </button>
-          <span className="text-text-primary font-semibold">BG {detailShloka.verseRange}</span>
+          <span className="text-primary font-serif font-medium text-lg">BG {detailShloka.verseRange}</span>
           <button
             onClick={() => togglePin(detailShloka)}
-            className="ml-auto text-text-muted"
-            title={p?.pinned ? 'Unpin' : 'Pin for review'}
+            className={`ml-auto p-2 rounded-full transition-colors ${isPinned ? 'text-accent-purple bg-accent-purple/10' : 'text-secondary hover:bg-border/30'}`}
+            title={isPinned ? 'Unpin' : 'Pin for review'}
           >
-            <svg className={`w-5 h-5 ${p?.pinned ? 'text-gold fill-gold' : ''}`} fill={p?.pinned ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-            </svg>
+            <Bookmark size={20} fill={isPinned ? 'currentColor' : 'none'} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-6 pb-24 max-w-lg mx-auto w-full space-y-6">
+        <div className="flex-1 overflow-y-auto no-scrollbar px-5 py-6 pb-24 max-w-lg mx-auto w-full space-y-6">
           <AudioPlayer src={detailShloka.audioPath} lines={detailShloka.sanskrit.split('\n').filter(Boolean)} />
           <VerseDisplay shloka={detailShloka} showSynonyms showTranslation showTransliteration />
           {p && (
-            <div className="card space-y-2">
-              <p className="section-label">Your Progress</p>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-secondary">Mastery</span>
-                <span className="text-text-primary">{'★'.repeat(p.masteryLevel)}{'☆'.repeat(5 - p.masteryLevel)}</span>
+            <div className="card space-y-3">
+              <p className="section-label mb-0">Progress Details</p>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-secondary font-medium">Mastery</span>
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star 
+                      key={i} 
+                      size={14} 
+                      className={i < p.masteryLevel ? 'text-accent-gold fill-accent-gold' : 'text-border'} 
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-secondary">Next review</span>
-                <span className="text-text-primary">{p.nextReviewDate || '—'}</span>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-secondary font-medium">Next review</span>
+                <span className="text-primary font-medium">{p.nextReviewDate || '—'}</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-text-secondary">Reviews done</span>
-                <span className="text-text-primary">{p.repetitions}</span>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-secondary font-medium">Reviews done</span>
+                <span className="text-primary font-medium">{p.repetitions}</span>
               </div>
             </div>
           )}
@@ -87,90 +96,106 @@ export default function LibraryScreen() {
   return (
     <div className="flex flex-col pb-24 max-w-lg mx-auto">
       {/* Header */}
-      <div className="px-4 pt-6 pb-3 sticky top-0 bg-base z-10">
-        <h2 className="text-text-primary font-bold text-xl mb-3">Library</h2>
-        <input
-          type="search"
-          placeholder="Search shlokas..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full bg-surface text-text-primary rounded-xl px-4 py-2.5 text-sm outline-none border border-elevated focus:border-gold transition-colors placeholder:text-text-muted mb-3"
-        />
+      <div className="px-5 pt-8 pb-4 sticky top-0 bg-background z-10">
+        <h1 className="text-primary font-serif font-semibold text-3xl mb-5">Library</h1>
+        
+        <div className="relative mb-5">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            type="search"
+            placeholder="Search verses..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-surface text-primary rounded-2xl pl-11 pr-4 py-3.5 text-sm outline-none border border-border focus:border-accent-purple focus:ring-1 focus:ring-accent-purple/20 transition-all shadow-sm placeholder:text-muted"
+          />
+        </div>
+
         {/* Filter chips */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-5 px-5">
           {MASTERY_FILTERS.map(f => (
             <button
               key={f}
               onClick={() => setSelectedMastery(f)}
-              className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                selectedMastery === f ? 'bg-gold text-base' : 'bg-elevated text-text-secondary'
+              className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                selectedMastery === f 
+                  ? 'bg-primary text-background shadow-sm' 
+                  : 'bg-surface border border-border text-secondary hover:border-accent-purple/30'
               }`}
             >
               {f}
             </button>
           ))}
-          <div className="w-px bg-elevated shrink-0 mx-1" />
+          <div className="w-px bg-border shrink-0 mx-1" />
           {CHAPTERS.slice(0, 7).map(c => (
             <button
               key={c}
               onClick={() => setSelectedChapter(c)}
-              className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                selectedChapter === c ? 'bg-gold text-base' : 'bg-elevated text-text-secondary'
+              className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                selectedChapter === c 
+                  ? 'bg-primary text-background shadow-sm' 
+                  : 'bg-surface border border-border text-secondary hover:border-accent-purple/30'
               }`}
             >
-              {c === 'All' ? 'All Ch.' : `Ch.${c}`}
+              {c === 'All' ? 'All Ch.' : `Ch. ${c}`}
+            </button>
+          ))}
+        </div>
+
+        {/* Tag filter */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pt-2 -mx-5 px-5">
+          {TAGS.map(t => (
+            <button
+              key={t}
+              onClick={() => setSelectedTag(t)}
+              className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                selectedTag === t 
+                  ? 'bg-accent-purple/10 text-accent-purple border border-accent-purple/20' 
+                  : 'bg-surface border border-border text-secondary hover:border-accent-purple/30'
+              }`}
+            >
+              {t}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Tag filter */}
-      <div className="px-4 pb-3 flex gap-2 overflow-x-auto no-scrollbar">
-        {TAGS.map(t => (
-          <button
-            key={t}
-            onClick={() => setSelectedTag(t)}
-            className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              selectedTag === t ? 'bg-rust/80 text-text-primary' : 'bg-elevated text-text-secondary'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {/* Count */}
-      <p className="px-4 text-text-muted text-xs mb-3">{filtered.length} shlokas</p>
+      <p className="px-5 text-muted font-medium text-xs mb-4">{filtered.length} shlokas found</p>
 
       {/* Grid */}
-      <div className="px-4 grid grid-cols-1 gap-3">
+      <div className="px-5 grid grid-cols-1 gap-3">
         {filtered.map(shloka => {
           const p = progress[shloka.id]
           const mastery = p?.masteryLevel ?? 0
           const firstLine = shloka.sanskrit.split('\n')[0]
+          
           return (
             <button
               key={shloka.id}
               onClick={() => setDetailShloka(shloka)}
-              className="card text-left hover:border-gold/30 border border-transparent transition-colors"
+              className="bg-surface rounded-3xl p-5 shadow-sm border border-border/60 text-left hover:border-accent-purple/40 hover:shadow-md transition-all group"
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="section-label">BG {shloka.verseRange}</span>
-                    <span className="text-text-muted text-xs">· {shloka.thematicTag}</span>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-bold text-accent-purple tracking-wide">BG {shloka.verseRange}</span>
+                    <span className="w-1 h-1 rounded-full bg-border"></span>
+                    <span className="text-secondary text-xs font-medium truncate">{shloka.thematicTag}</span>
                   </div>
-                  <p className="font-devanagari text-text-primary text-base leading-relaxed truncate">
+                  <p className="font-devanagari text-primary text-lg leading-snug truncate">
                     {firstLine}
                   </p>
                 </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <span className="text-gold text-xs">{'★'.repeat(mastery)}{'☆'.repeat(5 - mastery)}</span>
-                  {p?.pinned && (
-                    <svg className="w-3.5 h-3.5 text-gold fill-gold" viewBox="0 0 24 24">
-                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                    </svg>
-                  )}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={12} 
+                        className={i < mastery ? 'text-accent-gold fill-accent-gold' : 'text-border'} 
+                      />
+                    ))}
+                  </div>
+                  {p?.pinned && <Bookmark size={14} className="text-accent-purple fill-accent-purple" />}
                 </div>
               </div>
             </button>

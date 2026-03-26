@@ -31,9 +31,9 @@ export default function VerseDisplay({
     <div className="space-y-6">
       {/* Chapter / Verse badge */}
       <div className="flex items-center gap-2">
-        <span className="section-label">BG {shloka.verseRange}</span>
-        <span className="text-text-muted text-xs">·</span>
-        <span className="text-text-muted text-xs">{shloka.thematicTag}</span>
+        <span className="text-xs font-bold text-accent-purple tracking-wide">BG {shloka.verseRange}</span>
+        <span className="w-1 h-1 rounded-full bg-border"></span>
+        <span className="text-secondary text-xs font-medium">{shloka.thematicTag}</span>
       </div>
 
       {/* Sanskrit text */}
@@ -41,7 +41,7 @@ export default function VerseDisplay({
         {lines.map((line, i) => (
           <p
             key={i}
-            className="font-devanagari text-2xl leading-loose text-text-primary"
+            className="font-devanagari text-3xl leading-[1.8] text-primary"
           >
             {line}
           </p>
@@ -50,9 +50,9 @@ export default function VerseDisplay({
 
       {/* Transliteration */}
       {showTranslit && (
-        <div className="text-center space-y-0.5 border-t border-elevated pt-4">
+        <div className="text-center space-y-1 pt-2">
           {translitLines.map((line, i) => (
-            <p key={i} className="text-text-secondary text-sm italic leading-relaxed">
+            <p key={i} className="text-secondary text-[15px] italic leading-relaxed">
               {line}
             </p>
           ))}
@@ -61,56 +61,60 @@ export default function VerseDisplay({
 
       {/* Synonyms */}
       {showSynonyms && shloka.wordMeanings.length > 0 && (
-        <div className="border-t border-elevated pt-4 space-y-2">
-          <p className="section-label">Synonyms</p>
-          <div className="flex flex-wrap gap-x-1 gap-y-1 text-sm leading-relaxed">
-            {shloka.wordMeanings.map((wm, i) => (
-              <span key={i}>
-                <button
-                  onClick={() => setActiveWord(activeWord === i ? null : i)}
-                  className={`font-medium transition-colors ${
-                    activeWord === i ? 'text-gold' : 'text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  {wm.word}
-                </button>
-                {activeWord === i && (
-                  <span className="text-text-muted ml-1">— {wm.meaning}</span>
-                )}
-                {activeWord !== i && i < shloka.wordMeanings.length - 1 && (
-                  <span className="text-text-muted">; </span>
-                )}
-              </span>
-            ))}
+        <div className="border-t border-border pt-5 space-y-3">
+          <p className="section-label mb-0">Word Meanings</p>
+          <div className="flex flex-wrap gap-1.5 text-sm leading-relaxed">
+            {shloka.wordMeanings.map((wm, i) => {
+              const isActive = activeWord === i;
+              return (
+                <span key={i} className="inline-flex">
+                  <button
+                    onClick={() => setActiveWord(isActive ? null : i)}
+                    className={`font-medium transition-all px-2 py-1 rounded-lg ${
+                      isActive 
+                        ? 'bg-accent-purple text-white shadow-sm' 
+                        : 'bg-elevated text-primary hover:bg-border/50 border border-border/50'
+                    }`}
+                  >
+                    {wm.word}
+                  </button>
+                  {isActive && (
+                    <span className="text-secondary flex items-center px-2 py-1 bg-surface border border-border rounded-lg ml-1 shadow-sm font-medium animate-in fade-in zoom-in-95 duration-200">
+                      {wm.meaning}
+                    </span>
+                  )}
+                </span>
+              )
+            })}
           </div>
         </div>
       )}
 
       {/* Translation */}
       {showTranslation && currentTranslation && (
-        <div className="border-t border-elevated pt-4 space-y-3">
-          <p className="section-label">Translation</p>
-          <p className="text-text-primary font-semibold text-base leading-relaxed">
-            {currentTranslation.text}
-          </p>
-
-          {/* Translator selector */}
-          {englishTranslations.length > 1 && (
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-text-muted text-xs">Translator:</span>
+        <div className="border-t border-border pt-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="section-label mb-0">Translation</p>
+            {/* Translator selector */}
+            {englishTranslations.length > 1 && (
               <select
                 value={selectedTranslator}
                 onChange={e => setSelectedTranslator(e.target.value)}
-                className="bg-elevated text-text-secondary text-xs rounded-lg px-2 py-1 border-none outline-none"
+                className="bg-elevated text-secondary text-[10px] font-semibold uppercase tracking-wider rounded-lg px-2 py-1 border border-border outline-none focus:border-accent-purple transition-colors"
               >
                 {englishTranslations.map(t => (
                   <option key={t.authorId} value={t.authorId}>
-                    {t.authorName}
+                    {t.authorName.replace('Swami ', '')}
                   </option>
                 ))}
               </select>
-            </div>
-          )}
+            )}
+          </div>
+          <div className="bg-surface border border-border p-5 rounded-3xl shadow-sm">
+            <p className="text-primary font-serif font-medium text-lg leading-relaxed">
+              {currentTranslation.text}
+            </p>
+          </div>
         </div>
       )}
     </div>
