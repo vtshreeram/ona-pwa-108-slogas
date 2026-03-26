@@ -15,8 +15,8 @@ export default function HomeScreen({ onStartSession }: HomeScreenProps) {
   const [showDurationPicker, setShowDurationPicker] = useState(false)
 
   const todayStr = today()
-  const isMaintenance = settings.currentDay > 54
-  const dayLabel = isMaintenance ? 'Maintenance' : `Day ${settings.currentDay} of 54`
+  const isMaintenance = settings.currentDay > 53
+  const dayLabel = isMaintenance ? 'Maintenance' : `Day ${settings.currentDay} of 53`
 
   const learnedCount = Object.values(progress).filter(p => p.masteryLevel > 0).length
   const dueCount = Object.values(progress).filter(p => p.nextReviewDate <= todayStr && p.masteryLevel > 0).length

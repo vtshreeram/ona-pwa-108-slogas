@@ -116,7 +116,7 @@ async function main() {
 
     // Audio path: for multi-verse, we'll use the first verse's path
     // (ffmpeg concat handled separately for multi-verse)
-    const audioPath = `/audio/${chapter}/${verseNums.join('-')}.mp3`
+    const audioPath = `/audio/${id}.mp3`
 
     shlokas.push({
       id,

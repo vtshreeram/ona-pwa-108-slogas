@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import type { Shloka } from '../../types'
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react'
 
@@ -16,14 +16,14 @@ export default function FillBlank({ shloka, onResult }: FillBlankProps) {
   const [submitted, setSubmitted] = useState(false)
   const [correct, setCorrect] = useState(false)
 
-  const words = useMemo(() => {
+  const [words] = useState(() => {
     return shloka.transliteration.split(/\s+/).filter(Boolean)
-  }, [shloka.id])
+  })
 
-  const blankIdx = useMemo(() => {
+  const [blankIdx] = useState(() => {
     const mid = Math.floor(words.length / 3)
     return mid + Math.floor(Math.random() * Math.floor(words.length / 3))
-  }, [shloka.id])
+  })
 
   const answer = words[blankIdx] || ''
 

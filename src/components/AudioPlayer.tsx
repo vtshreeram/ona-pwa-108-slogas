@@ -26,6 +26,7 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
   }, [speed])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlaying(false)
     setActiveLine(-1)
     setLoaded(false)
@@ -36,7 +37,8 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
     if (!audio) return
     if (playing) {
       audio.pause()
-      setPlaying(false)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlaying(false)
     } else {
       audio.playbackRate = speed
       await audio.play().catch(() => {})
@@ -56,6 +58,7 @@ export default function AudioPlayer({ src, lines, compact = false, youtubeUrl, o
   const toggleSpeed = () => setSpeed(s => s === 1 ? 0.75 : 1)
 
   const handleEnded = () => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlaying(false)
     setActiveLine(-1)
     onEnded?.()

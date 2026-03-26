@@ -15,10 +15,10 @@ export default function ProgressScreen() {
 
   const todayStr = today()
 
-  // Build 54-day calendar
+  // Build 53-day calendar
   const calendarDays = useMemo(() => {
     const startDate = addDays(todayStr, -(settings.currentDay - 1))
-    return Array.from({ length: 54 }, (_, i) => {
+    return Array.from({ length: 53 }, (_, i) => {
       const date = addDays(startDate, i)
       const dayNum = i + 1
       const session = sessions.find(s => s.date === date && s.completed)
@@ -89,9 +89,9 @@ export default function ProgressScreen() {
         </div>
       </div>
 
-      {/* 54-day heatmap */}
+      {/* 53-day heatmap */}
       <div>
-        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">54-Day Journey</h2>
+        <h2 className="font-serif text-2xl text-primary font-medium mb-4 px-1">53-Day Journey</h2>
         <div className="card">
           <div className="grid grid-cols-9 gap-1.5 sm:gap-2">
             {calendarDays.map(({ dayNum, done, isFuture, isToday }) => (

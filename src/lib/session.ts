@@ -21,7 +21,7 @@ export function buildSessionQueue(
 ): SessionShloka[] {
   const date = today()
   const currentDay = settings.currentDay
-  const isMaintenance = currentDay > 54
+  const isMaintenance = currentDay > 53
 
   // New shlokas for today (by day assignment)
   const newShlokas: SessionShloka[] = isMaintenance

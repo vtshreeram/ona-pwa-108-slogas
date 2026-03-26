@@ -58,7 +58,7 @@ export interface AppSettings {
   showTransliteration: boolean
   reminderEnabled: boolean
   reminderTime: string | null  // "07:00"
-  currentDay: number           // 1–54, or 55+ for maintenance
+  currentDay: number           // 1–53, or 55+ for maintenance
   streakCount: number
   longestStreak: number
   lastSessionDate: string | null

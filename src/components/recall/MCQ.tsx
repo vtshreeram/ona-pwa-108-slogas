@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import type { Shloka } from '../../types'
 import { CheckCircle2, XCircle } from 'lucide-react'
 
@@ -15,7 +15,7 @@ export default function MCQ({ shloka, allShlokas, onResult }: MCQProps) {
   const questionLine = lines[0]
   const correctAnswer = lines.slice(1).join('\n') || lines[0]
 
-  const options = useMemo(() => {
+  const [options] = useState(() => {
     const others = allShlokas
       .filter(s => s.id !== shloka.id)
       .sort(() => Math.random() - 0.5)
@@ -28,7 +28,7 @@ export default function MCQ({ shloka, allShlokas, onResult }: MCQProps) {
     ].sort(() => Math.random() - 0.5)
 
     return all
-  }, [shloka.id])
+  })
 
   const handleSelect = (idx: number) => {
     if (selected !== null) return

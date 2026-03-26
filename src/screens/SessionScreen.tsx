@@ -44,6 +44,42 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   const completedPhases = queue.slice(0, queueIdx).reduce((acc, item) => acc + phasesForShloka(item.isNew).length, 0) + phaseIdx
   const progressPct = totalPhases > 0 ? (completedPhases / totalPhases) * 100 : 0
 
+  const finishSession = useCallback(async () => {
+    const todayStr = today()
+    const session = {
+      id: sessionId,
+      date: todayStr,
+      duration,
+      shlokasCovered: queue.map(q => q.shloka.id),
+      completed: true,
+      startedAt: sessionStarted,
+      completedAt: new Date().toISOString(),
+    }
+    await addSession(session)
+
+    const allSessions = [...sessions, session]
+    const { current, longest } = computeStreak(allSessions)
+    const newDay = settings.currentDay <= 53 ? settings.currentDay + 1 : settings.currentDay
+    await updateSettings({
+      streakCount: current,
+      longestStreak: Math.max(longest, settings.longestStreak),
+      lastSessionDate: todayStr,
+      currentDay: newDay,
+    })
+
+    setShowSummary(true)
+  }, [queue, sessions, settings, sessionId, sessionStarted, duration, addSession, updateSettings])
+
+  const advancePhase = useCallback(() => {
+    if (phaseIdx < phases.length - 1) {
+      setPhaseIdx(p => p + 1)
+    } else if (queueIdx < queue.length - 1) {
+      setQueueIdx(q => q + 1)
+      setPhaseIdx(0)
+    } else {
+      finishSession()
+    }
+  }, [phaseIdx, phases.length, queueIdx, queue.length, finishSession])
 
   const handleRecallResult = useCallback(async (correct: boolean, selfRating?: number) => {
     if (!currentItem) return
@@ -62,35 +98,10 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
     setTimeout(advancePhase, 800)
   }, [currentItem, updateProgress, advancePhase])
 
-  const finishSession = useCallback(async () => {
-    const todayStr = today()
-    const session = {
-      id: sessionId,
-      date: todayStr,
-      duration,
-      shlokasCovered: queue.map(q => q.shloka.id),
-      completed: true,
-      startedAt: sessionStarted,
-      completedAt: new Date().toISOString(),
-    }
-    await addSession(session)
-
-    const allSessions = [...sessions, session]
-    const { current, longest } = computeStreak(allSessions)
-    const newDay = settings.currentDay <= 54 ? settings.currentDay + 1 : settings.currentDay
-    await updateSettings({
-      streakCount: current,
-      longestStreak: Math.max(longest, settings.longestStreak),
-      lastSessionDate: todayStr,
-      currentDay: newDay,
-    })
-
-    setShowSummary(true)
-  }, [queue, sessions, settings, sessionId, sessionStarted, duration, addSession, updateSettings])
 
   if (queue.length === 0) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
+      <div className="min-h-screen bg-base flex flex-col items-center justify-center gap-6 px-6">
         <div className="text-5xl text-accent-green mb-4"><CheckCircle2 size={64} strokeWidth={1.5} /></div>
         <h2 className="text-primary font-serif font-medium text-3xl text-center">Nothing due today</h2>
         <p className="text-secondary text-center text-sm max-w-[250px]">All shlokas are up to date. Come back tomorrow for your next practice!</p>
@@ -104,7 +115,7 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
       ? (results.reduce((a, b) => a + b.quality, 0) / results.length).toFixed(1)
       : '—'
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-8 px-6 max-w-lg mx-auto">
+      <div className="min-h-screen bg-base flex flex-col items-center justify-center gap-8 px-6 max-w-lg mx-auto">
         <div className="text-accent-purple bg-accent-purple/10 p-6 rounded-full">
           <CheckCircle2 size={48} />
         </div>
@@ -138,7 +149,7 @@ export default function SessionScreen({ duration, onComplete, onExit }: SessionS
   const lines = shloka.sanskrit.split('\n').filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-base flex flex-col">
       {/* Top bar */}
       <div className="flex items-center gap-4 px-5 pt-safe pt-6 pb-4 bg-surface sticky top-0 z-20 border-b border-border shadow-sm">
         <button onClick={onExit} className="text-secondary hover:text-primary transition-colors p-1 -ml-1">
