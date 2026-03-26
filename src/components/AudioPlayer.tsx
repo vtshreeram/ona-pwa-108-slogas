@@ -18,7 +18,7 @@ export default function AudioPlayer({ src, lines, isRoman = false, compact = fal
   const [speed, setSpeed] = useState<1 | 0.75>(1)
   const [lineMode, setLineMode] = useState(false)
   const [activeLine, setActiveLine] = useState(-1)
-  const [loaded, setLoaded] = useState(false)
+  
 
   useEffect(() => {
     const audio = audioRef.current
@@ -30,7 +30,7 @@ export default function AudioPlayer({ src, lines, isRoman = false, compact = fal
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlaying(false)
     setActiveLine(-1)
-    setLoaded(false)
+    
   }, [src])
 
   const togglePlay = useCallback(async () => {
@@ -87,7 +87,7 @@ export default function AudioPlayer({ src, lines, isRoman = false, compact = fal
         ref={audioRef}
         src={src}
         onEnded={handleEnded}
-        onCanPlay={() => setLoaded(true)}
+        
         preload="auto"
       />
 
@@ -95,8 +95,8 @@ export default function AudioPlayer({ src, lines, isRoman = false, compact = fal
         {/* Play / Pause */}
         <button
           onClick={togglePlay}
-          disabled={!loaded}
-          className="w-12 h-12 rounded-full bg-primary text-base flex items-center justify-center disabled:opacity-40 active:scale-95 transition-all shadow-md"
+          
+          className="w-12 h-12 rounded-full bg-primary text-base flex items-center justify-center active:scale-95 transition-all shadow-md"
           style={{ color: 'var(--bg-base)' }}
           aria-label={playing ? 'Pause' : 'Play'}
         >
