@@ -2,6 +2,8 @@
 
 A personal PWA for memorizing 108 key Bhagavad Gita shlokas through a structured daily practice.
 
+[![Build with Ona](https://static.ona.app/build-with-ona.svg)](https://ona.app/build?repo=https://github.com/vts_official/gita-sadhana)
+
 ## What it does
 
 Built around a 1-hour daily routine using a closed-loop approach: **Listen → Repeat → Understand → Recall**. Progress is tracked through a 54-day journey (2 shlokas/day) with streaks, spaced repetition (SM-2), and revision cycles.
