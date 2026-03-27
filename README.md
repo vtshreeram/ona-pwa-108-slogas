@@ -2,7 +2,7 @@
 
 A personal PWA for memorizing 108 key Bhagavad Gita shlokas through a structured daily practice.
 
-[![Build with Ona](https://ona.com/)
+[Build with Ona](https://ona.com/)
 
 ## What it does
 
